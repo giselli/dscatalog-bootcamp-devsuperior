@@ -47,8 +47,18 @@ public class CategoryService {
 	@Transactional(readOnly = true)
 	public CategoryDTO findById(Long id) {
 		Optional<Category> obj = repository.findById(id);
-		//Com o o Optional o retorno da busca nunca será nulo
-		Category entity = obj.orElseThrow( () -> new EntityNotFoundException("Entity Not Found"));
+		// Com o o Optional o retorno da busca nunca será nulo
+		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity Not Found"));
+		return new CategoryDTO(entity);
+	}
+
+	@Transactional
+	public CategoryDTO insert(CategoryDTO dto) {
+		// objeto DTO deve ser convertido para um objeto Category (entidade)
+		Category entity = new Category();
+		entity.setName(dto.getName());
+		// para salvar:
+		entity = repository.save(entity);
 		return new CategoryDTO(entity);
 	}
 }
