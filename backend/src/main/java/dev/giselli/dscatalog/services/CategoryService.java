@@ -1,6 +1,7 @@
 package dev.giselli.dscatalog.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import dev.giselli.dscatalog.dto.CategoryDTO;
 import dev.giselli.dscatalog.entities.Category;
 import dev.giselli.dscatalog.repositories.CategoryRepository;
+import dev.giselli.dscatalog.services.exceptions.EntityNotFoundException;
 
 @Service
 /*
@@ -40,5 +42,13 @@ public class CategoryService {
 		 * listDto.add(new CategoryDTO(cat)); } return listDto; }
 		 */
 
+	}
+
+	@Transactional(readOnly = true)
+	public CategoryDTO findById(Long id) {
+		Optional<Category> obj = repository.findById(id);
+		//Com o o Optional o retorno da busca nunca será nulo
+		Category entity = obj.orElseThrow( () -> new EntityNotFoundException("Entity Not Found"));
+		return new CategoryDTO(entity);
 	}
 }
