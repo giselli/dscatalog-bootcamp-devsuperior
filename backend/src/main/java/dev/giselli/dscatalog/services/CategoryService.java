@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import dev.giselli.dscatalog.dto.CategoryDTO;
 import dev.giselli.dscatalog.entities.Category;
 import dev.giselli.dscatalog.repositories.CategoryRepository;
-import dev.giselli.dscatalog.services.exceptions.EntityNotFoundException;
+import dev.giselli.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @Service
 /*
@@ -60,5 +62,29 @@ public class CategoryService {
 		// para salvar:
 		entity = repository.save(entity);
 		return new CategoryDTO(entity);
+	}
+
+	/*
+	 * @Transactional public CategoryDTO udpate(Long id, CategoryDTO dto) {
+	 * 
+	 * try { Category entity = repository.getOne(id); // getOne só vai no banco de
+	 * dados quando se mandar salvar entity.setName(dto.getName()); entity =
+	 * repository.save(entity); return new CategoryDTO(entity); } catch
+	 * (EntityNotFoundException e) { throw new
+	 * ResourceNotFoundException("ID not found " + id); }
+	 * 
+	 * }
+	 */
+	@Transactional
+	public CategoryDTO update(Long id, CategoryDTO dto) {
+		try {
+			Category entity = repository.getOne(id); // getOne do not access database until you save the entity
+			entity.setName(dto.getName());
+			entity = repository.save(entity);
+
+			return new CategoryDTO(entity);
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException(String.format("ID not found [%d]", id));
+		}
 	}
 }
