@@ -1,18 +1,21 @@
 package dev.giselli.dscatalog.services;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import dev.giselli.dscatalog.dto.CategoryDTO;
 import dev.giselli.dscatalog.entities.Category;
 import dev.giselli.dscatalog.repositories.CategoryRepository;
+import dev.giselli.dscatalog.services.exceptions.DatabaseException;
 import dev.giselli.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @Service
@@ -31,12 +34,12 @@ public class CategoryService {
 	@Transactional(readOnly = true) // readOnly não trava o banco de dados
 	// importar do Spring
 	// vários métodos relacionados a uma transação
-	public List<CategoryDTO> findAll() {
+	public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
 		// deve acessar o repository e chamar as categorias no banco de dados
 		// return repository.findAll();
-		List<Category> list = repository.findAll();
+		Page<Category> list = repository.findAll(pageRequest);
 
-		return list.stream().map(x -> new CategoryDTO(x)).collect(Collectors.toList());
+		return list.map(x -> new CategoryDTO(x));
 		// collect transforma novamente o stream em lista
 
 		/*
@@ -85,6 +88,18 @@ public class CategoryService {
 			return new CategoryDTO(entity);
 		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException(String.format("ID not found [%d]", id));
+		}
+	}
+
+	// não tem o Transactional
+	public void delete(Long id) {
+		try {
+			repository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException("ID not found" + id);
+		} catch (DataIntegrityViolationException e) {
+			// tentar deletar algo que não pode - integridade referencial no banco
+			throw new DatabaseException("Integrity violaton");
 		}
 	}
 }
