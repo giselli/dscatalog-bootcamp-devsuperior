@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,10 +34,10 @@ public class CategoryService {
 	@Transactional(readOnly = true) // readOnly não trava o banco de dados
 	// importar do Spring
 	// vários métodos relacionados a uma transação
-	public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
+	public Page<CategoryDTO> findAllPaged(Pageable pageable) {
 		// deve acessar o repository e chamar as categorias no banco de dados
 		// return repository.findAll();
-		Page<Category> list = repository.findAll(pageRequest);
+		Page<Category> list = repository.findAll(pageable);
 
 		return list.map(x -> new CategoryDTO(x));
 		// collect transforma novamente o stream em lista
