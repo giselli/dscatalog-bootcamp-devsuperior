@@ -13,10 +13,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import dev.giselli.dscatalog.dto.ProductDTO;
 import dev.giselli.dscatalog.entities.Product;
 import dev.giselli.dscatalog.repositories.ProductRepository;
 import dev.giselli.dscatalog.services.exceptions.DatabaseException;
@@ -67,6 +70,20 @@ public class ProductServiceTests {
 
 		Mockito.doThrow(DataIntegrityViolationException.class).when(repository).deleteById(dependentId);
 		//quando tenta deletar um objeto associado com outro - integridade referencial
+	}
+	
+	@Test
+	public void findAllPageShouldReturnPage() {
+	//teste de unidade para ver se retorna uma página
+		
+		Pageable pageable = PageRequest.of(0, 10);
+		
+		Page<ProductDTO> result = service.findAllPaged(pageable);
+		
+		Assertions.assertNotNull(result);
+		Mockito.verify(repository, Mockito.times(1)).findAll(pageable);
+		//testa se o repository.findAll(pageable) foi realmente chamado dentro do findAll(pageable) do service
+		
 	}
 
 	@Test
