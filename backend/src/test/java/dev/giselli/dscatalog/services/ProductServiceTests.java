@@ -42,6 +42,7 @@ public class ProductServiceTests {
 		// quando chama o deleteById com um id que não existe
 
 		Mockito.doThrow(DataIntegrityViolationException.class).when(repository).deleteById(dependentId);
+		//quando tenta deletar um objeto associado com outro - integridade referencial
 	}
 
 	@Test
@@ -77,5 +78,5 @@ public class ProductServiceTests {
 		// verifica se alguma chamada foi feita
 		// times indica quantas vezes será chamado o deleteById no repository
 	}
-
+	
 }
