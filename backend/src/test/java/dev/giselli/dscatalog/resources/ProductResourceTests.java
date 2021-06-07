@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import dev.giselli.dscatalog.dto.ProductDTO;
 import dev.giselli.dscatalog.services.ProductService;
@@ -25,28 +27,35 @@ public class ProductResourceTests {
 
 	@Autowired
 	private MockMvc mockmvc;
-	
+
 	@MockBean
 	private ProductService service;
-	
+
 	private ProductDTO productDTO;
-	
+
 	private PageImpl<ProductDTO> page;
-	//objeto concreto
-	
+	// objeto concreto
+
 	@BeforeEach
-	void setUp() throws Exception{
-	//simulando o comportamento do findAllPaged do Service	
-		
+	void setUp() throws Exception {
+		// simulando o comportamento do findAllPaged do Service
+
 		productDTO = Factory.createProductDTO();
 		page = new PageImpl<>(List.of(productDTO));
-		
+
 		when(service.findAllPaged(ArgumentMatchers.any())).thenReturn(page);
 	}
-	
+
 	@Test
-	public void findAllShouldReturnPage() throws Exception{
-		mockmvc.perform(get("/products")).andExpect(status().isOk());	
-		//perforn faz uma requisição http com o caminho products
+	public void findAllShouldReturnPage() throws Exception {
+		// mockmvc.perform(get("/products")).andExpect(status().isOk());
+		// perforn faz uma requisição http com o caminho products
+
+		// outra forma de fazê-lo:
+		ResultActions result = 
+				mockmvc.perform(get("/products")
+						.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isOk());
 	}
 }
